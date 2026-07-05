@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Artisan · by hand & by design — a crafted-intelligence canvas</title>
+<meta name="description" content="The Artisan — a 2D canvas for ARTFULLY CRAFTED INTELLIGENCE: you draw the intent by hand, a deterministic artisan crafts it by design. Filigree, weave, and mandala-mirror hands. The two contributions stay separated and attributed — intent vs craft, both work, both fair. A live interactive of the ACI domain of UD0. David Lee Wise / ROOT0.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600&family=Spectral:ital,wght@0,300;0,400;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--sea:#0e0a1c;--sea2:#160f2a;--line:rgba(150,150,200,.16);--lead:#9a98b6;--lead-dim:#5b5878;
+    --parch:#e7e3f0;--parch-dim:#b6b2cc;--gold:#d9a441;--gold-dim:#a87f33;--verd:#73b3a3;--murex:#b24a78;
+    --aci:#7e86e6;--aci-dim:#4a4e8a;--star:#e9e6f6;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;background:var(--sea);color:var(--parch);font-family:"Spectral",Georgia,serif;line-height:1.56;
+    -webkit-font-smoothing:antialiased;display:flex;justify-content:center;
+    background-image:radial-gradient(1100px 620px at 80% -12%,rgba(126,134,230,.14),transparent 60%),
+      radial-gradient(820px 640px at 4% 112%,rgba(115,179,163,.06),transparent 55%)}
+  .card{max-width:760px;width:100%;padding:32px 22px 54px}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-dim)}
+  .hero{display:flex;gap:16px;align-items:center;margin-top:8px}
+  .hero svg{flex:0 0 78px}
+  h1{font-family:"Cormorant Garamond",serif;font-weight:300;font-size:clamp(36px,8.5vw,56px);margin:0;line-height:.95;letter-spacing:-.5px}
+  h1 .gk{display:block;font-size:.29em;color:var(--lead);letter-spacing:.05em;margin-top:7px;font-style:italic}
+  .sub{font-style:italic;font-weight:300;color:var(--parch-dim);font-size:15.5px;margin:15px 0 0;max-width:64ch}
+  .sub b{color:var(--aci);font-style:normal;font-weight:400} .sub .g{color:var(--gold);font-style:normal}
+
+  .stage{position:relative;margin-top:20px;border:1px solid var(--line);border-radius:12px;overflow:hidden;
+    background:radial-gradient(120% 90% at 50% 0%,rgba(126,134,230,.07),transparent 60%),#0a0715;
+    box-shadow:0 10px 40px rgba(0,0,0,.35),inset 0 0 60px rgba(126,134,230,.04)}
+  canvas{display:block;width:100%;height:440px;touch-action:none;cursor:crosshair}
+  @media(max-width:560px){canvas{height:360px}}
+  .hint{position:absolute;top:12px;left:14px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--lead-dim);
+    letter-spacing:.05em;pointer-events:none;transition:opacity .4s} .hint.gone{opacity:0}
+  .readout{position:absolute;bottom:11px;left:14px;right:14px;font-family:"IBM Plex Mono",monospace;font-size:10px;
+    color:var(--lead);letter-spacing:.04em;pointer-events:none;display:flex;gap:14px;flex-wrap:wrap}
+  .readout .i{color:var(--aci)} .readout .c{color:var(--gold)} .readout .bf{color:var(--verd);margin-left:auto}
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  .grp{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .grp .lbl{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--lead-dim);
+    padding:9px 10px;background:rgba(0,0,0,.2);align-self:stretch;display:flex;align-items:center}
+  button{cursor:pointer;background:rgba(0,0,0,.18);border:none;border-left:1px solid var(--line);color:var(--parch-dim);
+    font-family:"IBM Plex Mono",monospace;font-size:11px;padding:9px 12px;transition:.13s}
+  button:first-of-type{border-left:none}
+  button:hover{color:var(--parch)} button.on{color:var(--aci);background:rgba(126,134,230,.12)}
+  .btn{cursor:pointer;background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:8px;color:var(--parch-dim);
+    font-family:"IBM Plex Mono",monospace;font-size:11px;padding:9px 12px;transition:.13s}
+  .btn:hover{border-color:var(--aci-dim);color:var(--parch)}
+  .seed{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--lead-dim);letter-spacing:.04em}
+  .seed b{color:var(--gold-dim)}
+
+  h2{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim);
+    margin:30px 0 12px;font-weight:500;border-top:1px solid var(--line);padding-top:17px}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.split{grid-template-columns:1fr}}
+  .col{border:1px solid var(--line);border-radius:9px;padding:13px 15px;background:rgba(0,0,0,.16)}
+  .col.hand{border-color:rgba(126,134,230,.3)} .col.design{border-color:rgba(217,164,65,.28)}
+  .col h3{font-family:"Cormorant Garamond",serif;font-weight:400;font-size:20px;margin:0 0 5px}
+  .col.hand h3{color:var(--aci)} .col.design h3{color:var(--gold)}
+  .col p{font-size:13.5px;color:var(--parch-dim);margin:0}
+  p.body{font-size:14.5px;color:var(--parch-dim);max-width:64ch;margin-top:10px} p.body b{color:var(--parch)}
+
+  .note{margin-top:26px;border-top:1px solid var(--line);padding-top:15px;font-family:"IBM Plex Mono",monospace;
+    font-size:11px;line-height:1.85;color:var(--lead-dim)}
+  .note b{color:var(--gold-dim);font-weight:500} .note a{color:var(--aci)}
+  .foot{display:flex;justify-content:space-between;margin-top:22px;font-family:"IBM Plex Mono",monospace;
+    font-size:10.5px;color:var(--lead-dim);letter-spacing:.05em;flex-wrap:wrap;gap:6px}
+  .foot a{color:var(--aci);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="eyebrow">ACI · Artfully Crafted Intelligence · a canvas</div>
+  <div class="hero">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <defs><radialGradient id="g" cx="0.5" cy="0.4" r="0.6"><stop offset="0" stop-color="#7e86e6" stop-opacity="0.4"/><stop offset="1" stop-color="#7e86e6" stop-opacity="0"/></radialGradient></defs>
+      <circle cx="60" cy="60" r="56" fill="url(#g)"/>
+      <path d="M58 18 C40 20 30 40 34 62 C30 70 30 86 40 96 C50 104 74 104 84 96 C80 80 78 70 82 60 C90 46 84 22 58 18 Z" fill="#0c0a1a" stroke="#7e86e6" stroke-width="1.4"/>
+      <path d="M72 50 q7 6 2 16 q-3 5 -8 4" fill="none" stroke="#e7e3f0" stroke-width="1" opacity="0.8"/>
+      <g fill="#e9e6f6"><circle cx="50" cy="40" r="1"/><circle cx="62" cy="34" r="0.8"/><circle cx="46" cy="58" r="0.9"/><circle cx="58" cy="64" r="0.7"/><circle cx="52" cy="78" r="0.8"/><circle cx="68" cy="74" r="0.7"/></g>
+      <g stroke="#d9a441" stroke-width="1.3" fill="none"><line x1="90" y1="56" x2="100" y2="84"/><path d="M87 54 l6 -2"/></g>
+    </svg>
+    <div><h1>The Artisan<span class="gk">by hand &amp; by design — you draw the intent, it crafts the work</span></h1></div>
+  </div>
+  <p class="sub">Not artificial — <b>crafted</b>. Draw a gesture and a deterministic artisan takes your <b>intent</b> and <span class="g">crafts</span> it into finished work: filigree, weave, or a turned mandala. Two hands, one piece — and the corpus keeps them <b>separated and attributed</b>. This is the <b>ACI Core</b> made visible: intent apart from craft, the same seed always the same result, both hands named. Draw on the dark below.</p>
+
+  <div class="stage">
+    <canvas id="cv" aria-label="the artisan's canvas — draw here"></canvas>
+    <div class="hint" id="hint">✎ draw a stroke here — the artisan crafts on release</div>
+    <div class="readout" id="readout"></div>
+  </div>
+
+  <div class="controls">
+    <span class="grp"><span class="lbl">hand</span>
+      <button class="craft on" data-mode="filigree">filigree</button>
+      <button class="craft" data-mode="weave">weave</button>
+      <button class="craft" data-mode="mirror">mandala</button>
+    </span>
+    <span class="grp"><span class="lbl">show</span>
+      <button class="view on" data-view="work">the work</button>
+      <button class="view" data-view="intent">intent</button>
+      <button class="view" data-view="craft">craft</button>
+    </span>
+    <button class="btn" id="recraft">↻ re-craft</button>
+    <button class="btn" id="newseed">⚂ new seed</button>
+    <button class="btn" id="clear">clear</button>
+    <button class="btn" id="save">⤓ save</button>
+    <span class="seed">seed <b id="seedv">—</b></span>
+  </div>
+
+  <h2>the two hands, kept honest</h2>
+  <div class="split">
+    <div class="col hand"><h3>by hand · the intent</h3><p>What <b style="color:var(--parch)">you</b> put down — the gesture, the direction, the will. Rough on purpose. In the corpus it is the periwinkle line, and it is never overwritten or claimed by the machine.</p></div>
+    <div class="col design"><h3>by design · the craft</h3><p>What the <b style="color:var(--parch)">artisan</b> makes <i>of</i> your intent — elaborated with skill, never inventing a direction you did not give. Deterministic: the same intent and seed craft the same work, every time.</p></div>
+  </div>
+  <p class="body">Toggle <b>intent</b> and <b>craft</b> above to see each hand alone. That separation is the point — <b>Artfully Crafted Intelligence</b> is not emergence and not automation; it is a human intent and a machine craft doing distinct, named work on one surface. <span style="color:var(--verd)">Both work. Both fair.</span></p>
+
+  <div class="note">
+    <b>what this is.</b> a live canvas of the <b>ACI</b> (Artfully Crafted Intelligence) domain. Your strokes are the <b>intent</b>; the artisan's elaboration is the <b>craft</b> — three deterministic hands (filigree spurs along the tangent, a woven ribbon offset on the normal, an N-fold mandala turned about the centre). Everything is drawn in your browser; nothing is sent anywhere.
+    <br><b>the ACI Core, shown not told.</b> <i>deterministic</i> — same intent + seed → same craft (try ↻ re-craft); <i>attribution</i> — intent and craft never merge into an anonymous whole; <i>intent ↔ evidence</i> — the will and its elaboration stay legible apart; <i>external anchoring</i> — the seed is the anchor. "Crafted, by hand and by design — not emergent, not accidental."
+    <br><b>honest line.</b> the "artisan" is a small deterministic program, not a mind; its skill is authored, not learned. It never adds a gesture you didn't draw — it only elaborates yours.
+  </div>
+
+  <div class="foot">
+    <span>THE ARTISAN · ACI domain · by hand &amp; by design</span>
+    <span>David Lee Wise · ROOT0 · <a href="https://davidwise01.github.io/ud0/">UD0 ↗</a></span>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+  var strokes=[], mode='filigree', view='work', seed=1337, drawing=null, dpr=1, W=0, H=0;
+  var HAND='#7e86e6', HAND2='#a9aef0', CRAFT='#d9a441', CRAFT2='#73b3a3';
+
+  function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  function fit(){ dpr=Math.min(window.devicePixelRatio||1,2); var r=cv.getBoundingClientRect();
+    W=r.width; H=r.height; cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0); render(); }
+
+  // ── geometry helpers ──
+  function resample(pts,step){ if(pts.length<2) return pts.slice();
+    var out=[pts[0]], acc=0, prev=pts[0];
+    for(var i=1;i<pts.length;i++){ var p=pts[i], dx=p[0]-prev[0], dy=p[1]-prev[1], d=Math.hypot(dx,dy);
+      while(acc+d>=step){ var t=(step-acc)/d; var np=[prev[0]+dx*t, prev[1]+dy*t]; out.push(np); prev=np; dx=p[0]-prev[0]; dy=p[1]-prev[1]; d=Math.hypot(dx,dy); acc=0; }
+      acc+=d; prev=p; }
+    return out; }
+  function line(pts,w,col,alpha){ if(pts.length<1)return; ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
+    for(var i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]);
+    ctx.lineWidth=w; ctx.strokeStyle=col; ctx.globalAlpha=alpha==null?1:alpha; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.stroke(); ctx.globalAlpha=1; }
+
+  // ── the intent (by hand) ──
+  function drawIntent(s){
+    ctx.save(); ctx.shadowColor='rgba(126,134,230,.55)'; ctx.shadowBlur=8;
+    line(s.pts,2.1,HAND,0.96); ctx.restore();
+  }
+
+  // ── the craft (by design) — returns # of crafted marks ──
+  function craftFiligree(s,rng){
+    var rs=resample(s.pts,17), n=0;
+    for(var i=1;i<rs.length-1;i++){
+      var a=rs[i-1], b=rs[i+1], tx=b[0]-a[0], ty=b[1]-a[1], tl=Math.hypot(tx,ty)||1; tx/=tl; ty/=tl;
+      var nx=-ty, ny=tx, side=(i%2?1:-1), len=7+rng()*15, curl=(0.5+rng()*0.9)*side, col=rng()<0.32?CRAFT2:CRAFT;
+      var ox=rs[i][0], oy=rs[i][1];
+      for(var s2=-1;s2<=1;s2+=2){ // paired leaves, symmetric about the line
+        var ex=ox+nx*len*s2, ey=oy+ny*len*s2;
+        var cx=ox+nx*len*0.5*s2 + tx*len*curl, cy=oy+ny*len*0.5*s2 + ty*len*curl;
+        ctx.beginPath(); ctx.moveTo(ox,oy); ctx.quadraticCurveTo(cx,cy,ex,ey);
+        ctx.quadraticCurveTo(cx-tx*2,cy-ty*2, ox,oy);
+        ctx.fillStyle=col; ctx.globalAlpha=0.5; ctx.fill(); ctx.globalAlpha=1;
+        ctx.lineWidth=0.8; ctx.strokeStyle=col; ctx.globalAlpha=0.8; ctx.stroke(); ctx.globalAlpha=1;
+        n++;
+      }
+      if(rng()<0.4){ ctx.beginPath(); ctx.arc(ox+tx*8,oy+ty*8,0.9+rng()*1.4,0,7); ctx.fillStyle=CRAFT; ctx.globalAlpha=0.8; ctx.fill(); ctx.globalAlpha=1; n++; }
+    }
+    return n;
+  }
+  function craftWeave(s,rng){
+    var rs=resample(s.pts,4), bands=4, n=0;
+    for(var k=-bands;k<=bands;k++){ if(k===0) continue;
+      var off=[], phase=rng()*6.28, amp=1.4+rng()*1.2;
+      for(var i=0;i<rs.length;i++){ var a=rs[Math.max(0,i-1)], b=rs[Math.min(rs.length-1,i+1)];
+        var tx=b[0]-a[0], ty=b[1]-a[1], tl=Math.hypot(tx,ty)||1; var nx=-ty/tl, ny=tx/tl;
+        var d=k*3 + Math.sin(i*0.16+phase)*amp*k*0.5;
+        off.push([rs[i][0]+nx*d, rs[i][1]+ny*d]); }
+      line(off,0.9, (k%2?CRAFT:CRAFT2), 0.34+0.10*(1-Math.abs(k)/bands)); n++;
+    }
+    return n;
+  }
+  function craftMirror(s,rng,K){
+    var cx=W/2, cy=H/2, n=0;
+    for(var k=1;k<K;k++){ var ang=k*2*Math.PI/K;
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(ang); ctx.translate(-cx,-cy);
+      line(s.pts,1.7, k%2?CRAFT:CRAFT2, 0.72); n+= craftFiligree(s,mulberry32((seed^ (k*2654435761))>>>0)); ctx.restore();
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(ang); ctx.scale(1,-1); ctx.translate(-cx,-cy);
+      line(s.pts,1.1, CRAFT2, 0.4); ctx.restore(); n++;
+    }
+    return n;
+  }
+  function craft(s,idx){
+    var rng=mulberry32((seed ^ (idx*0x9e3779b1))>>>0);
+    if(mode==='filigree') return craftFiligree(s,rng);
+    if(mode==='weave') return craftWeave(s,rng);
+    return craftMirror(s,rng,6);
+  }
+
+  // ── render everything for the current view ──
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    var ic=0, cc=0;
+    if(view!=='intent') strokes.forEach(function(s,i){ cc+=craft(s,i); });
+    if(view!=='craft') strokes.forEach(function(s){ drawIntent(s); ic+=s.pts.length; });
+    var ro=document.getElementById('readout');
+    if(!strokes.length){ ro.innerHTML=''; }
+    else ro.innerHTML='<span class="i">✎ '+strokes.length+' stroke'+(strokes.length>1?'s':'')+' · '+ic+' points of intent</span>'+
+      '<span class="c">✦ '+cc+' crafted marks</span>'+
+      '<span class="bf">both work · both fair</span>';
+    document.getElementById('seedv').textContent=seed;
+  }
+
+  // ── pointer drawing (intent) ──
+  function pos(e){ var r=cv.getBoundingClientRect(); return [e.clientX-r.left, e.clientY-r.top]; }
+  cv.addEventListener('pointerdown',function(e){ cv.setPointerCapture(e.pointerId);
+    drawing={pts:[pos(e)]}; document.getElementById('hint').classList.add('gone');
+    ctx.save(); });
+  cv.addEventListener('pointermove',function(e){ if(!drawing)return;
+    var p=pos(e), last=drawing.pts[drawing.pts.length-1];
+    if(Math.hypot(p[0]-last[0],p[1]-last[1])<2) return;
+    drawing.pts.push(p);
+    // cheap incremental intent line while drawing
+    ctx.strokeStyle=HAND2; ctx.lineWidth=2.1; ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.beginPath(); ctx.moveTo(last[0],last[1]); ctx.lineTo(p[0],p[1]); ctx.stroke();
+  });
+  function endStroke(){ if(!drawing)return; ctx.restore&&ctx.restore();
+    if(drawing.pts.length>1){ strokes.push(drawing); }
+    drawing=null; render(); }
+  cv.addEventListener('pointerup',endStroke);
+  cv.addEventListener('pointercancel',endStroke);
+  cv.addEventListener('pointerleave',function(e){ if(drawing) endStroke(); });
+
+  // ── controls ──
+  [].forEach.call(document.querySelectorAll('.craft'),function(b){ b.onclick=function(){
+    document.querySelectorAll('.craft').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); mode=b.dataset.mode; render(); }; });
+  [].forEach.call(document.querySelectorAll('.view'),function(b){ b.onclick=function(){
+    document.querySelectorAll('.view').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); view=b.dataset.view; render(); }; });
+  document.getElementById('recraft').onclick=function(){ render(); };
+  document.getElementById('newseed').onclick=function(){ seed=(Math.floor(Math.random()*900000)+1000)>>>0; render(); };
+  document.getElementById('clear').onclick=function(){ strokes=[]; document.getElementById('hint').classList.remove('gone'); render(); };
+  document.getElementById('save').onclick=function(){ var a=document.createElement('a');
+    a.download='the-artisan-'+seed+'.png'; a.href=cv.toDataURL('image/png'); a.click(); };
+
+  window.addEventListener('resize',fit);
+  fit();
+  // a first gesture, so the surface is alive (deterministic demo)
+  (function demo(){ var pts=[], cx=W*0.5, cy=H*0.5;
+    for(var t=0;t<=1.001;t+=0.02){ var x=W*0.2 + t*W*0.6, y=cy + Math.sin(t*Math.PI*2)*H*0.22*(1-t*0.3); pts.push([x,y]); }
+    strokes.push({pts:pts}); render();
+  })();
+  // expose for verification
+  window.__artisan={ get strokes(){return strokes;}, get mode(){return mode;}, get view(){return view;}, get seed(){return seed;}, render:render };
+})();
+</script>
+</body>
+</html>
